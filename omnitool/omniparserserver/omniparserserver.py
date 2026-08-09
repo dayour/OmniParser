@@ -1,5 +1,5 @@
 '''
-python -m omniparserserver --caption_model_name florence2 --caption_model_path ../../weights/icon_caption_florence --device cuda --BOX_TRESHOLD 0.05
+python -m omniparserserver --caption_model_name florence2 --caption_model_path ../../weights/florence31_icon_caption --device cuda --BOX_TRESHOLD 0.05
 '''
 
 import sys
@@ -17,7 +17,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Omniparser API')
     parser.add_argument('--som_model_path', type=str, default=None, help='Optional local detector path; V3 downloads from Hugging Face by default')
     parser.add_argument('--caption_model_name', type=str, default='florence2', help='Name of the caption model')
-    parser.add_argument('--caption_model_path', type=str, default='../../weights/icon_caption_florence', help='Path to the caption model')
+    parser.add_argument('--caption_model_path', type=str, default='../../weights/florence31_icon_caption', help='Path to the caption model')
     parser.add_argument('--device', type=str, default='cpu', help='Device to run the model')
     parser.add_argument('--BOX_TRESHOLD', type=float, default=0.05, help='Threshold for box detection')
     parser.add_argument('--host', type=str, default='127.0.0.1', help='Host for the API')

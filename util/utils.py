@@ -17,18 +17,7 @@ import cv2
 import numpy as np
 # %matplotlib inline
 from matplotlib import pyplot as plt
-import easyocr
-from paddleocr import PaddleOCR
-reader = easyocr.Reader(['en'])
-paddle_ocr = PaddleOCR(
-    lang='en',  # other lang also available
-    use_angle_cls=False,
-    use_gpu=False,  # using cuda will conflict with pytorch in the same process
-    show_log=False,
-    max_batch_size=1024,
-    use_dilation=True,  # improves accuracy
-    det_db_score_mode='slow',  # improves accuracy
-    rec_batch_num=1024)
+from omniparser_ocr import read_text
 import time
 import base64
 
@@ -60,12 +49,31 @@ def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2
             model_name_or_path, device_map=None, torch_dtype=torch.float16
         ).to(device)
     elif model_name == "florence2":
-        from transformers import AutoProcessor, AutoModelForCausalLM 
-        processor = AutoProcessor.from_pretrained("microsoft/Florence-2-base", trust_remote_code=True)
-        if device == 'cpu':
-            model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.float32, trust_remote_code=True)
-        else:
-            model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.float16, trust_remote_code=True).to(device)
+        from transformers import Florence2ForConditionalGeneration, Florence2Processor
+
+        checkpoint = Path(model_name_or_path)
+        if not checkpoint.is_absolute():
+            checkpoint = Path(__file__).resolve().parents[1] / checkpoint
+        config_file = checkpoint / "config.json"
+        if not config_file.is_file():
+            raise FileNotFoundError(
+                f"No Florence caption checkpoint at {checkpoint}. Convert the legacy "
+                f"weights to the native format as described in docs/specs/florence-3.1.md, "
+                f"then point --caption_model_path at weights/florence31_icon_caption."
+            )
+        with open(config_file, encoding="utf-8") as f:
+            checkpoint_config = json.load(f)
+        if "auto_map" in checkpoint_config:
+            raise RuntimeError(
+                f"{checkpoint} is a legacy remote-code Florence-2 checkpoint. Its custom "
+                f"modeling code is incompatible with the installed transformers, so it is "
+                f"not loadable. Convert it per docs/specs/florence-3.1.md and point "
+                f"--caption_model_path at weights/florence31_icon_caption."
+            )
+
+        processor = Florence2Processor.from_pretrained(checkpoint)
+        dtype = torch.float32 if device == 'cpu' else torch.float16
+        model = Florence2ForConditionalGeneration.from_pretrained(checkpoint, dtype=dtype)
     return {'model': model.to(device), 'processor': processor}
 
 
@@ -511,7 +519,7 @@ def get_xywh_yolo(input):
     x, y, w, h = int(x), int(y), int(w), int(h)
     return x, y, w, h
 
-def check_ocr_box(image_source: Union[str, Image.Image], display_img = True, output_bb_format='xywh', goal_filtering=None, easyocr_args=None, use_paddleocr=False):
+def check_ocr_box(image_source: Union[str, Image.Image], display_img = True, output_bb_format='xywh', goal_filtering=None, text_threshold=0.5):
     if isinstance(image_source, str):
         image_source = Image.open(image_source)
     if image_source.mode == 'RGBA':
@@ -519,20 +527,14 @@ def check_ocr_box(image_source: Union[str, Image.Image], display_img = True, out
         image_source = image_source.convert('RGB')
     image_np = np.array(image_source)
     w, h = image_source.size
-    if use_paddleocr:
-        if easyocr_args is None:
-            text_threshold = 0.5
-        else:
-            text_threshold = easyocr_args['text_threshold']
-        result = paddle_ocr.ocr(image_np, cls=False)[0]
-        coord = [item[0] for item in result if item[1][1] > text_threshold]
-        text = [item[1][0] for item in result if item[1][1] > text_threshold]
-    else:  # EasyOCR
-        if easyocr_args is None:
-            easyocr_args = {}
-        result = reader.readtext(image_np, **easyocr_args)
-        coord = [item[0] for item in result]
-        text = [item[1] for item in result]
+    result = read_text(image_source)
+    # get_xywh/get_xyxy index a quad polygon at [0] (top-left) and [2] (bottom-right),
+    # so widen each axis-aligned xyxy box back into that four-point form.
+    coord = [
+        [(b.box[0], b.box[1]), (b.box[2], b.box[1]), (b.box[2], b.box[3]), (b.box[0], b.box[3])]
+        for b in result.boxes if b.confidence > text_threshold
+    ]
+    text = [b.text for b in result.boxes if b.confidence > text_threshold]
     if display_img:
         opencv_img = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
         bb = []

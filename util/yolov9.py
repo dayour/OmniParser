@@ -11,6 +11,9 @@ from torchvision.ops import batched_nms
 
 DEFAULT_REPO_ID = "microsoft/OmniParser-v2.0"
 DEFAULT_MODEL_FILE = "icon_detect_v3/model.pt"
+# The YOLOv9-E weights are not on main yet; they live on the open PR branch.
+# See OmniParser README and https://huggingface.co/microsoft/OmniParser-v2.0/discussions/37
+DEFAULT_REVISION = "refs/pr/37"
 
 
 class Boxes:
@@ -34,7 +37,7 @@ class YOLOv9Detector:
         model_path: Union[str, Path, None] = None,
         device: Union[str, torch.device, None] = None,
         repo_id: str = DEFAULT_REPO_ID,
-        revision: str = "main",
+        revision: str = DEFAULT_REVISION,
     ):
         self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
         if self.device.type == "cuda" and not torch.cuda.is_available():
