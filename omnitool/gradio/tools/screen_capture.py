@@ -5,7 +5,9 @@ from PIL import Image
 from .base import BaseAnthropicTool, ToolError
 from io import BytesIO
 
-OUTPUT_DIR = "./tmp/outputs"
+# Anchored to the gradio app root rather than the process working directory, so
+# screenshots land in the same place no matter where the app is launched from.
+OUTPUT_DIR = str(Path(__file__).resolve().parents[1] / "tmp" / "outputs")
 
 def get_screenshot(resize: bool = False, target_width: int = 1920, target_height: int = 1080):
     """Capture screenshot by requesting from HTTP endpoint - returns native resolution unless resized"""

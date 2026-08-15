@@ -3,8 +3,8 @@ import base64
 from pathlib import Path
 from tools.screen_capture import get_screenshot
 from agent.llm_utils.utils import encode_image
-
-OUTPUT_DIR = "./tmp/outputs"
+# Must resolve to the same directory screen_capture.py writes into.
+OUTPUT_DIR = str(Path(__file__).resolve().parents[2] / "tmp" / "outputs")
 
 class OmniParserClient:
     def __init__(self, 

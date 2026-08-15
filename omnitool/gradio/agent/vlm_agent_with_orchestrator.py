@@ -18,7 +18,7 @@ from agent.llm_utils.utils import is_image_path
 import time
 import re
 import os
-OUTPUT_DIR = "./tmp/outputs"
+OUTPUT_DIR = str(Path(__file__).resolve().parents[1] / "tmp" / "outputs")
 ORCHESTRATOR_LEDGER_PROMPT = """
 Recall we are working on the following request:
 

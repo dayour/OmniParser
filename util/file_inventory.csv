@@ -1,0 +1,9 @@
+file_name,location,intended_functionality
+__init__.py,OmniParser\util,Empty package marker file (0 bytes) with no exports or imports; serves only to make OmniParser\util a Python package.
+box_annotator.py,OmniParser\util,"Draws colour-coded bounding boxes with auto-positioned numeric labels on images using OpenCV, given supervision Detections; includes IoU helpers to avoid label overlap."
+docs_robocopy.ps1,OmniParser\util,"Syncs this folder's file_inventory.csv with its central copy under docs\inventory, in either direction, treating robocopy exit codes 0 through 7 as success."
+file_inventory.csv,OmniParser\util,This inventory: the audited list of every file in this folder with a one line statement of its intended functionality.
+omniparser.py,OmniParser\util,"Orchestrates end-to-end screen parsing: loads YOLO icon-detector and a Florence-2/BLIP2 caption model, then runs OCR plus detection plus captioning to return a labelled image and structured element list."
+sync.bat,OmniParser\util,"Launcher that runs docs_robocopy.ps1 from any working directory, forwarding switches such as -Pull and -WhatIf."
+utils.py,OmniParser\util,"Core library providing YOLO/DINO model loading, EasyOCR/PaddleOCR text detection, icon captioning via BLIP2 or Florence-2, bounding-box annotation, overlap removal, and the central get_som_labeled_img pipeline."
+yolov9.py,OmniParser\util,"TorchScript YOLOv9-E icon detector with an Ultralytics-compatible predict API; handles image pre-processing, letterbox padding, inference, NMS post-processing, and optional HuggingFace Hub weight download."

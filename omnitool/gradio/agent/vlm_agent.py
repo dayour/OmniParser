@@ -15,8 +15,10 @@ from agent.llm_utils.groqclient import run_groq_interleaved
 from agent.llm_utils.utils import is_image_path
 import time
 import re
+from pathlib import Path
 
-OUTPUT_DIR = "./tmp/outputs"
+# Must resolve to the same directory screen_capture.py writes into.
+OUTPUT_DIR = str(Path(__file__).resolve().parents[1] / "tmp" / "outputs")
 
 def extract_data(input_string, data_type):
     # Regular expression to extract content starting from '```python' until the end if there are no closing backticks

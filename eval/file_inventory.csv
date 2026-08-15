@@ -1,0 +1,6 @@
+file_name,location,intended_functionality
+docs_robocopy.ps1,OmniParser\eval,"Syncs this folder's file_inventory.csv with its central copy under docs\inventory, in either direction, treating robocopy exit codes 0 through 7 as success."
+file_inventory.csv,OmniParser\eval,This inventory: the audited list of every file in this folder with a one line statement of its intended functionality.
+logs_sspro_omniv2.json,OmniParser\eval,"Newline-delimited evaluation log of roughly 1581 entries recording OmniParser v2 predictions on ScreenSpot-Pro, each capturing the screenshot path, instruction, predicted coordinates, ground-truth box, and correctness label."
+ss_pro_gpt4o_omniv2.py,OmniParser\eval,Evaluation script that benchmarks OmniParser v2 grounding accuracy on ScreenSpot Pro by running GPT-4o or Phi-3.5-Vision over parsed screenshots and scoring predicted click coordinates against ground truth.
+sync.bat,OmniParser\eval,"Launcher that runs docs_robocopy.ps1 from any working directory, forwarding switches such as -Pull and -WhatIf."

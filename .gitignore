@@ -12,3 +12,10 @@ index.html?linkid=2289031
 wget-log
 weights/icon_caption_florence_v2/
 omnitool/gradio/uploads/
+weights/.cache/
+# Florence 3.1 conversion output. The tensor and the tokenizer blob are build
+# artifacts reproducible from docs/specs/florence-3.1.md, so they stay out; the
+# small configs and PROVENANCE.json are the record of what the conversion did
+# (image_position_embed, bart) and are worth tracking.
+weights/florence31_icon_caption/*.safetensors
+weights/florence31_icon_caption/tokenizer.json

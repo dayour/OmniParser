@@ -1,0 +1,6 @@
+file_name,location,intended_functionality
+docs_robocopy.ps1,OmniParser\omnitool\omnibox\scripts,"Syncs this folder's file_inventory.csv with its central copy under docs\inventory, in either direction, treating robocopy exit codes 0 through 7 as success."
+file_inventory.csv,OmniParser\omnitool\omnibox\scripts,This inventory: the audited list of every file in this folder with a one line statement of its intended functionality.
+manage_vm.ps1,OmniParser\omnitool\omnibox\scripts,"Windows PowerShell VM lifecycle manager that builds or reuses the Docker image then creates, starts, stops, or deletes the Windows VM container, polling the control server probe endpoint from the host via Invoke-WebRequest."
+manage_vm.sh,OmniParser\omnitool\omnibox\scripts,"Bash VM lifecycle manager for Linux and macOS offering the same create, start, stop, and delete commands, but polling the control server probe endpoint with curl run inside the container via docker exec."
+sync.bat,OmniParser\omnitool\omnibox\scripts,"Launcher that runs docs_robocopy.ps1 from any working directory, forwarding switches such as -Pull and -WhatIf."

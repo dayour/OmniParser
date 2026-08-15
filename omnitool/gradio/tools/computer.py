@@ -11,8 +11,10 @@ from .base import BaseAnthropicTool, ToolError, ToolResult
 from .screen_capture import get_screenshot
 import requests
 import re
+from pathlib import Path
 
-OUTPUT_DIR = "./tmp/outputs"
+# Must resolve to the same directory screen_capture.py writes into.
+OUTPUT_DIR = str(Path(__file__).resolve().parents[1] / "tmp" / "outputs")
 
 TYPING_DELAY_MS = 12
 TYPING_GROUP_SIZE = 50
