@@ -25,7 +25,7 @@ transformers>=5.1.0
 # PyPI. 0.23.1 makes "import transformers" raise in dependency_versions_check.py.
 tokenizers<=0.22.2
 safetensors>=0.7.0
-huggingface_hub>=1.26.1
+huggingface_hub>=1.27.0
 accelerate>=1.14.0
 timm>=1.0.28
 einops>=0.8.0
@@ -44,9 +44,12 @@ requests>=2.34.2
 # imports all three, none of which were declared anywhere. A clean install of this
 # file could not start the server.
 fastapi>=0.141.1
-# uvicorn's PyPI metadata advertises 0.52.3, but no installable artifact exists
-# above 0.52.1 -- `pip install "uvicorn>=0.52.3"` fails to resolve. Floor is the
-# newest version that actually ships.
+# uvicorn 0.52.2 and 0.52.3 exist on upstream PyPI, but the index this repo
+# installs through (packagefeedproxy.microsoft.io) serves nothing above 0.52.1,
+# so `pip install "uvicorn>=0.52.3"` fails to resolve here. An earlier note in
+# this file blamed PyPI for not publishing the artifact, which was wrong; the
+# artifact exists, the mirror just does not carry it. 0.52.1 is the newest
+# version installable from both, so it is the floor.
 uvicorn>=0.52.1
 pydantic>=2.13.4
 
