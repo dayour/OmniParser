@@ -39,7 +39,21 @@ $pythonAlias = $pythonDetails.alias
 # Check for Python installation
 $pythonExecutablePath = Get-ChildItem -Path $userPythonPath -Filter python.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
 
-# Force to install Python 3.10 as the pre-installed version on Windows may not work sometimes
+# Force a pinned Python install; the version pre-installed on Windows is often
+# the Microsoft Store stub, which cannot install packages. The version is read
+# back out of the mirror URL in tools_config.json so it is declared in exactly
+# one place. It used to be written twice -- once in the URL and once as a
+# hardcoded Python310 directory -- and $pythonVersion below was never assigned
+# at all, so the download line printed an empty version.
+$pythonVersionMatch = [regex]::Match($pythonDetails.mirrors[0], '/python/(\d+)\.(\d+)\.(\d+)/')
+if (-not $pythonVersionMatch.Success) {
+    Write-Error "Could not read the Python version from the mirror URL in tools_config.json"
+    exit
+}
+$pythonMajor = $pythonVersionMatch.Groups[1].Value
+$pythonMinor = $pythonVersionMatch.Groups[2].Value
+$pythonVersion = "$pythonMajor.$pythonMinor.$($pythonVersionMatch.Groups[3].Value)"
+$pythonInstallDirName = "Python$pythonMajor$pythonMinor"
 Write-Host "Downloading Python $pythonVersion..."
 $pythonInstallerFilePath = "$env:TEMP\python_installer.exe"
 $downloadResult = Invoke-DownloadFileFromAvailableMirrors -mirrorUrls $pythonDetails.mirrors -outfile $pythonInstallerFilePath
@@ -48,7 +62,7 @@ if (-not $downloadResult) {
 } else {
     Write-Host "Installing Python for current user..."
     Start-Process -FilePath $pythonInstallerFilePath -Args "/quiet InstallAllUsers=0 PrependPath=0" -NoNewWindow -Wait
-    $pythonExecutablePath = "$userPythonPath\Python310\python.exe"
+    $pythonExecutablePath = "$userPythonPath\$pythonInstallDirName\python.exe"
     $setAliasExpression = "Set-Alias -Name $pythonAlias -Value `"$pythonExecutablePath`""
     Add-Content -Path $PROFILE -Value $setAliasExpression
     Invoke-Expression $setAliasExpression
