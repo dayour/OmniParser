@@ -1,2 +1,17 @@
-flask
-PyAutoGUI
+# Dependencies for the omnibox Windows 11 VM control server (main.py).
+#
+# This installs inside the guest VM, not into the host environment, so it is a
+# separate resolution from OmniParser/requirements.txt. The versions are still
+# pinned to agree with that file: the same package resolving differently on
+# host and guest is how a screen coordinate bug becomes unreproducible.
+#
+# pyautogui is held at the same exact version as the root requirements rather
+# than floated, because 0.9.54 is both the root pin and the current release.
+pyautogui==0.9.54
+
+flask>=3.1.3
+
+# Imported by main.py (`from PIL import Image`) to encode screenshots, but never
+# declared here. The install only worked when something else happened to pull
+# Pillow in first.
+pillow>=12.3.0

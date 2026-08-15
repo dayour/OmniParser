@@ -5,8 +5,14 @@
 #   easyocr, paddlepaddle, paddleocr - replaced by the first-party omniparser-ocr
 #       package (winrt backend). Installed by the parent repo from ../omniparser-ocr;
 #       do NOT add it here by name, "omniocr" on PyPI is an unrelated third party.
-#   ultralytics==8.3.70 - AGPL-3.0 and unused. util/yolov9.py imports no ultralytics
-#       and omniparserserver.py defaults model_path=None, routing to YOLOv9Detector.
+#   ultralytics==8.3.70 - AGPL-3.0. The default path never reaches it: model_path
+#       defaults to None, which routes to util/yolov9.py's YOLOv9Detector. It was
+#       previously described here as simply "unused", which was wrong -- util/utils.py
+#       did import it on the legacy-checkpoint branch, so dropping the dependency
+#       turned that branch into a bare ModuleNotFoundError. get_yolo_model now raises
+#       a RuntimeError naming the licence and the supported flag instead.
+#       eval/ss_pro_gpt4o_omniv2.py still imports it at module scope and therefore
+#       does not run without it; that eval is not part of the served path.
 #   numpy==1.26.4 - an ABI-breaking downgrade for torch 2.13 and opencv 5.
 #   opencv-python - duplicate of opencv-python-headless, the correct choice for a
 #       server with no GUI.
@@ -27,6 +33,22 @@ einops>=0.8.0
 numpy>=2.0
 opencv-python-headless>=5.0.0
 supervision>=0.30.0
+# Direct imports that upstream never declared and that pip only resolved because
+# torch, gradio and supervision happen to pull them in. A transitive dependency
+# is not a contract: if any of those three drops it, this breaks at import time.
+pillow>=12.3.0
+matplotlib>=3.11.1
+requests>=2.34.2
+
+# omnitool/omniparserserver/omniparserserver.py is the OmniParser HTTP server and
+# imports all three, none of which were declared anywhere. A clean install of this
+# file could not start the server.
+fastapi>=0.141.1
+# uvicorn's PyPI metadata advertises 0.52.3, but no installable artifact exists
+# above 0.52.1 -- `pip install "uvicorn>=0.52.3"` fails to resolve. Floor is the
+# newest version that actually ships.
+uvicorn>=0.52.1
+pydantic>=2.13.4
 
 openai>=2.53.0
 anthropic[bedrock,vertex]>=0.37.1

@@ -88,9 +88,16 @@ def get_yolo_model(model_path=None, device=None):
 
         return YOLOv9Detector(model_path=model_path, device=device)
 
-    from ultralytics import YOLO
-
-    return YOLO(model_path)
+    # Anything else is a legacy Ultralytics checkpoint. ultralytics is AGPL-3.0
+    # and is deliberately not a dependency of this fork, so say that plainly
+    # here rather than letting the import raise a bare ModuleNotFoundError that
+    # reads like a broken install.
+    raise RuntimeError(
+        f"{model_path} is a legacy Ultralytics YOLO checkpoint. This fork detects "
+        f"icons with util/yolov9.py and does not depend on ultralytics, which is "
+        f"AGPL-3.0 licensed. Point --om_model_path at weights/icon_detect_v3, or "
+        f"pass no path at all to use the bundled detector."
+    )
 
 
 @torch.inference_mode()
